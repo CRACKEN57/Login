@@ -11,7 +11,7 @@ export const LoginStyles = StyleSheet.create({
   },
   input: {
     height: 40,
-    width: '50%',
+    width: '80%',
     borderColor: '#2c11da',
     borderWidth: 1,
     padding: 10,
@@ -26,6 +26,7 @@ export const LoginStyles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 5,
     paddingHorizontal: 20,
+    marginTop: 15,
   },
   buttonText: {
     fontSize: 18,
@@ -34,6 +35,9 @@ export const LoginStyles = StyleSheet.create({
   text: {
     fontSize: 20,
     marginBottom: 10,
+  },
+  registerText:{
+    fontSize: 18,
   },
   errorText: {
     fontSize: 16,
