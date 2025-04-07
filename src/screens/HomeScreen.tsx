@@ -1,26 +1,31 @@
 import React from 'react'
-import { StyleSheet, Text, View } from 'react-native';
+import { Alert, Button, Text, View } from 'react-native';
+import { HomeStyles } from '../styles/Home.styles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const HomeScreen = ({route}:any) => {
-    const {user} = route.params; // Extracting the user object from route params
-    console.log(user); // Logging the user object to the console
+
+
+const HomeScreen = ({ route, navigation }: any) => {
+
+  const { user } = route.params; // Extraer el usuario desde login
+
+  const LogOut = async () => {
+    try {
+      await AsyncStorage.removeItem("user")
+      navigation.replace("Login")
+    } catch (error) {
+      Alert.alert("Error", `${error}`)
+    }
+  }
+
+
   return (
- <View style={styles.container}>
-    <Text style={styles.text}>Bienvenido {user.name}</Text>
-    
- </View>
-  );
-};
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    text: {
-        fontSize: 20,
-        fontWeight: 'bold',
-    },
-});
 
-export default HomeScreen;
+    <View style={HomeStyles.container}>
+      <Button title="Cerrar Sesion" onPress={LogOut} />
+      <Text style={HomeStyles.text}>Bienvenido,{user}</Text>
+    </View>
+  )
+}
+
+export default HomeScreen

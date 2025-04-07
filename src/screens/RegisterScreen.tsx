@@ -1,72 +1,78 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import React, { useState } from 'react'
+import { Alert, View, TextInput, Button, StyleSheet } from 'react-native'
+import { RegisterStyles } from '../styles/Register.styles'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const RegisterScreen = ({ navigation }: any) => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
 
-  const handleRegister = () => {
-    // Validar campos vacíos
+  const handleRegistration = async() => {
     if (!username || !email || !password) {
-      Alert.alert('Error', 'Por favor, completa todos los campos.');
+      Alert.alert("Error", "Todos los campos son obligatorios");
       return;
     }
+    try {
 
-    // Simular registro exitoso
-    Alert.alert('Registro exitoso', `Usuario ${username} registrado correctamente.`);
-    
-    // Opcional: Navegar a otra pantalla (por ejemplo, Login)
-    navigation.navigate('Login');
-  };
+      //Obetener los datos de AsyncStorage
+      const data =  await AsyncStorage.getItem("users")
+
+      //Parsear los datos
+      const users = data ? JSON.parse(data) : [];
+
+      //Verificar si el usuario ya existe por medio de map
+      const existingUser = users.map((user: any) => user.username === username || user.email === email);
+
+      if (existingUser) {
+        Alert.alert("Error", "El usuario ya existe");
+        return;
+      }
+
+      //Agregar el nuevo usuario al array de usuarios
+      const newUser = { username, email, password };
+      users.push(newUser);
+      await AsyncStorage.setItem("users", JSON.stringify(users));
+
+      console.log( await AsyncStorage.getItem("users") );
+      
+      //Redireccionar al login
+      Alert.alert("Exito", "Usuario registrado con exito");
+      navigation.navigate("Login");
+
+    }
+    catch (error) {
+        Alert.alert("Error", `${error}`)
+    }
+
+  }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Registro</Text>
+    <View style={RegisterStyles.container}>
       <TextInput
-        style={styles.input}
-        placeholder="Nombre de usuario"
+        style={RegisterStyles.input}
+        placeholder="Username"
         value={username}
-        onChangeText={setUsername}
+        onChangeText={(text) => setUsername(text)}
       />
       <TextInput
-        style={styles.input}
-        placeholder="Correo electrónico"
+        style={RegisterStyles.input}
+        placeholder="Email"
         value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
+        onChangeText={(text) => setEmail(text)}
       />
       <TextInput
-        style={styles.input}
-        placeholder="Contraseña"
+        style={RegisterStyles.input}
+        placeholder="Password"
+        secureTextEntry={false}
         value={password}
-        onChangeText={setPassword}
-        secureTextEntry
+        onChangeText={(text) => setPassword(text)}
       />
-      <Button title="Registrar" onPress={handleRegister} />
+
+      <Button title="Registrarse" onPress={handleRegistration} />
+    
     </View>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 8,
-  },
-});
-
-export default RegisterScreen;
+export default RegisterScreen

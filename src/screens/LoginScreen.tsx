@@ -1,99 +1,84 @@
-import React from 'react';
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react'
+import { Alert, Button, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { LoginStyles } from '../styles/Login.styles'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const LoginScreen = ({ navigation }: any) => {
-    // Estado para almacenar el nombre de usuario y la contraseña
-    const [username, setUsername] = React.useState('');
-    const [password, setPassword] = React.useState('');
 
-    // Función para manejar el inicio de sesión
-    const handleLogin = () => {
-        // Validar campos vacíos
-        if (username === '' || password === '') {
-            Alert.alert('Por favor, completa todos los campos.');
-            return;
-        }
-        // Simular autenticación exitosa
-        if (username === 'admin' && password === 'admin') {
-            Alert.alert('Inicio de sesión exitoso');
-            navigation.navigate('Home', { user: { name: username } });
-        } else {
-            Alert.alert('Usuario o contraseña incorrectos');
-            return;
-        }
-    };
+  //Estado para el usuario y contraseña
+  const [user, setUser] = useState("")
+  const [password, setPaswword] = useState("")
+  const [email, setEmail] = useState("")
 
-    return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Iniciar Sesión</Text>
-            <Text style={styles.subtitle}>Bienvenido de nuevo</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Nombre de usuario"
-                value={username}
-                onChangeText={setUsername}
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="Contraseña"
-                secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-            />
-            <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                <Text style={styles.buttonText}>Iniciar Sesión</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                style={[styles.button, styles.registerButton]}
-                onPress={() => navigation.navigate('Register')}
-            >
-                <Text style={styles.buttonText}>Registrarse</Text>
-            </TouchableOpacity>
-        </View>
-    );
-};
+  //Funcion de validacion y redireccion
+  const LoginByUser = async () => {
+    if (!user || !password || !email) {
+      Alert.alert("Error", "Todos los campos son obligatorios");
+      return;
+    }
+    try {
+      //Obetener los datos de AsyncStorage
+      const UserData = await AsyncStorage.getItem("user");
+      const DataUsers = UserData ? JSON.parse(UserData) : [];
+      
+      //Obetner el usuario que se quiere logear
+      const LoginUser = DataUsers.find((item: any) => item.username === user && item.password === password && item.email === email);
 
-export default LoginScreen;
+      //Verficar si el usuario existe
+      if (!LoginUser) {
+        Alert.alert("Error", "Usuario o contraseña incorrectos");
+        return;
+      }
+      
+      //Redireccionar al home
+      console.log("LoginUser =>", LoginUser);
+      
+      Alert.alert("Exito", "Bienvenido");
+      navigation.navigate("Home", { user: LoginUser.username });
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    input: {
-        width: '80%',
-        height: 50,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        marginBottom: 20,
-        paddingHorizontal: 10,
-    },
-    button: {
-        backgroundColor: '#007BFF',
-        padding: 15,
-        borderRadius: 5,
-        width: '80%',
-        alignItems: 'center',
-        marginTop: 10,
-    },
-    registerButton: {
-        backgroundColor: '#28A745', // Color diferente para el botón de registro
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-    },
-    subtitle: {
-        fontSize: 18,
-        marginBottom: 20,
-    },
-});
+    } catch (error) {
+      Alert.alert("Error", `${error}`);
+    }
+  };
 
 
+  return (
+    <View style={LoginStyles.container}>
+      <Text style={LoginStyles.text}> Iniciar Sesion </Text>
 
+
+      <TextInput
+        style={LoginStyles.input}
+        placeholder="Usuario"
+        onChangeText={(text) => setUser(text)}
+      ></TextInput>
+
+      <TextInput
+        style={LoginStyles.input}
+        placeholder="Contraseña"
+        secureTextEntry={true}
+        onChangeText={(text) => setPaswword(text)}
+      ></TextInput>
+
+      <TextInput
+        style={LoginStyles.input}
+        placeholder="Email"
+        onChangeText={(text) => setEmail(text)}
+      ></TextInput>
+
+      <Button title="Iniciar Sesion" onPress={LoginByUser} />
+
+      <TouchableOpacity
+        onPress={() => navigation.navigate("Register")}
+        style={LoginStyles.button}
+      >
+        <Text style={LoginStyles.text}>No tienes cuenta?</Text>
+
+      </TouchableOpacity>
+
+    </View>
+  )
+}
+
+
+export default LoginScreen
