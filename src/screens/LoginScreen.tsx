@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Alert, Button, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { LoginStyles } from '../styles/Login.styles'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useState } from 'react'
 
 const LoginScreen = ({ navigation }: any) => {
 

@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Alert, View, TextInput, Button, StyleSheet } from 'react-native'
 import { RegisterStyles } from '../styles/Register.styles'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useState } from 'react'
 
 const RegisterScreen = ({ navigation }: any) => {
   const [username, setUsername] = useState("")
